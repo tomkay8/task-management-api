@@ -23,7 +23,7 @@ class Task(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True)
-    due_date = models.DateField()
+    due_date = models.DateTimeField(null=True, blank=True)
     priority = models.CharField(max_length=10, choices=PRIORITY_CHOICES, default='Medium')
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='Pending')
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True)

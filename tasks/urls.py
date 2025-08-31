@@ -1,11 +1,13 @@
+from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import TaskViewSet, CategoryViewSet
+from .views import TaskViewSet, CategoryViewSet, TaskListView
 
-# Using DRF's DefaultRouter to automatically create CRUD routes
 router = DefaultRouter()
 router.register(r'tasks', TaskViewSet, basename='task')
 router.register(r'categories', CategoryViewSet, basename='category')
 
-# Export router URLs
-urlpatterns = router.urls
+urlpatterns = [
+    path('', include(router.urls)),               # All ViewSet routes
+    path('tasks/filter/', TaskListView.as_view(), name='task-list-filter'),
+]
 

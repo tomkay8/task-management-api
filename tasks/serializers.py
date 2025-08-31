@@ -1,25 +1,74 @@
+"""
 from rest_framework import serializers
 from .models import Task, Category
 from django.contrib.auth.models import User
 
-# Serializer for User model
+
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'username', 'email']  # Expose id, username, and email only
+        fields = ['id', 'username', 'email']
 
-# Serializer for Category model
+
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
-        fields = ['id', 'name']  # Expose category id and name
+        fields = ['id', 'name']
 
-# Serializer for Task model
+
 class TaskSerializer(serializers.ModelSerializer):
-    user = UserSerializer(read_only=True)        # Nested user info (read-only)
-    category = CategorySerializer(read_only=True) # Nested category info (read-only)
+    # Accept IDs for user and category in requests
+    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
+    category = serializers.PrimaryKeyRelatedField(queryset=Category.objects.all())
 
     class Meta:
         model = Task
-        fields = '__all__'  # Include all fields from Task model
+        fields = [
+            "id",
+            "title",
+            "description",
+            "status",
+            "category",
+            "user",
+            "due_date",
+            "created_at",
+        ]
+"""
+from rest_framework import serializers
+from .models import Task, Category
+from django.contrib.auth.models import User
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ["id", "username", "email"]
+
+class CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = ["id", "name"]
+
+class TaskSerializer(serializers.ModelSerializer):
+    # Accept IDs when writing
+    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), write_only=True)
+    category = serializers.PrimaryKeyRelatedField(queryset=Category.objects.all(), write_only=True)
+
+    # Show nested objects when reading
+    user_details = UserSerializer(source="user", read_only=True)
+    category_details = CategorySerializer(source="category", read_only=True)
+
+    class Meta:
+        model = Task
+        fields = [
+            "id",
+            "title",
+            "description",
+            "status",
+            "category",
+            "user",
+            "user_details",
+            "category_details",
+            "due_date",
+            "created_at",
+        ]
 
